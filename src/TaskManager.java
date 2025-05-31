@@ -44,17 +44,29 @@ public class TaskManager {
     // Логика работы с сабтасками
     public SubTask createSubTask(SubTask subtask) {
         Epic epic = epics.get(subtask.getEpicId());
+        if (epic == null) {
+            return null;
+        }
+
         subtask.setTaskId(getNextId());
         subTasks.put(subtask.getTaskId(), subtask);
         epic.addSubTaskId(subtask.getTaskId());
+        updateEpicStatus(epic.getTaskId());
         return subtask;
     }
 
     public void updateSubTask(SubTask subtask) {
-        if (subTasks.containsKey(subtask.getTaskId())) {
-            subTasks.put(subtask.getTaskId(), subtask);
-            updateEpicStatus(subtask.getEpicId());
+        if (!subTasks.containsKey(subtask.getTaskId())) {
+            return;
         }
+
+        SubTask subTask = subTasks.get(subtask.getTaskId());
+        if (subTask.getEpicId() != subtask.getEpicId()) {
+            return;
+        }
+
+        subTasks.put(subtask.getTaskId(), subtask);
+        updateEpicStatus(subtask.getEpicId());
     }
 
     public SubTask deleteSubTask(Integer subTaskId) {
@@ -71,6 +83,11 @@ public class TaskManager {
 
     public void deleteAllSubTasks() {
         subTasks.clear();
+
+        for (Epic epic : epics.values()) {
+            epic.clearSubTasksIds();
+            updateEpicStatus(epic.getTaskId());
+        }
     }
 
     public ArrayList<SubTask> getSubtaskList() {
@@ -102,6 +119,16 @@ public class TaskManager {
         return epic;
     }
 
+    public void updateEpic(Epic epic) {
+        Epic verifiableEpic = epics.get(epic.getTaskId());
+        if (verifiableEpic == null) {
+            return;
+        }
+
+        verifiableEpic.setName(epic.getName());
+        verifiableEpic.setDescription(epic.getDescription());
+    }
+
     public Epic deleteEpicById(Integer taskId) {
         Epic removedEpic = epics.remove(taskId);
         if (removedEpic != null) {
@@ -127,9 +154,13 @@ public class TaskManager {
         return epics.get(epicId);
     }
 
-    public void updateEpicStatus (Integer epicId) {
+    private void updateEpicStatus (Integer epicId) {
         Epic epic = epics.get(epicId);
-        if (epic == null || epic.getSubTasksIds().isEmpty()) {
+        if (epic == null) {
+            return;
+        }
+
+        if (epic.getSubTasksIds().isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
             return;
         }
