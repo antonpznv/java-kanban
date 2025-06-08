@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
-    Integer getNextId();
-
     // Логика работы с тасками
     Task createTask(Task task);
 
@@ -19,7 +17,7 @@ public interface TaskManager {
 
     void deleteAllTasks();
 
-    ArrayList<Task> getTaskList();
+    List<Task> getTaskList();
 
     Task getTaskById(Integer taskId);
 
@@ -32,11 +30,11 @@ public interface TaskManager {
 
     void deleteAllSubTasks();
 
-    ArrayList<SubTask> getSubtaskList();
+    List<SubTask> getSubtaskList();
 
     SubTask getSubTaskById(Integer subTaskId);
 
-    ArrayList<SubTask> getSubTasksByEpicId(Integer epicId);
+    List<SubTask> getSubTasksByEpicId(Integer epicId);
 
     // Логика работы с эпиками
     Epic createEpic(Epic epic);
@@ -47,7 +45,7 @@ public interface TaskManager {
 
     void deleteAllEpics();
 
-    ArrayList<Epic> getEpicList();
+    List<Epic> getEpicList();
 
     Epic getEpicById(Integer epicId);
 
